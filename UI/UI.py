@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
 
-def plotData(tidalEnergyGeneration, windEnergyGeneration, solarEnergyGeneration, totalEnergyGeneration):
+def plotData(tidalEnergyGeneration, windEnergyGeneration, solarEnergyGeneration, totalEnergyGeneration, netEnergyDemand):
     days = np.arange(1, len(tidalEnergyGeneration)+1)
     energy1 = tidalEnergyGeneration
     energy2 = windEnergyGeneration
     energy3 = solarEnergyGeneration
     energy4 = totalEnergyGeneration
+    # energy5 = netEnergyDemand
     energies = [energy1, energy2, energy3, energy4]
     fig, axs = plt.subplots(nrows=2, ncols=2)
 

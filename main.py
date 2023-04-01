@@ -1,6 +1,6 @@
 from Model.Models import *
 from UI.UI import *
-from Data.data import *
+from Data.Data import *
 
 # Instantiating the component facilities
 tidalInstance =  TidalEnergyModel(
@@ -34,6 +34,10 @@ tidalEnergyGeneration = tidalInstance.getTidalEnergyGeneration()
 windEnergyGeneration = windInstance.getWindGeneration()
 solarEnergyGeneration = solarInstance.getSolarGeneration()
 totalEnergyGeneration = renewableInstance.getPowerGeneration()
+netEnergyDemand = renewableInstance.getNetEnergyDemand(
+    energyDemand=energyDemandData,
+    frequencyOfData=1,
+)
 
 # Plotting the data
 plotData(
@@ -41,4 +45,5 @@ plotData(
     windEnergyGeneration=windEnergyGeneration,
     solarEnergyGeneration=solarEnergyGeneration,
     totalEnergyGeneration=totalEnergyGeneration,
+    netEnergyDemand=netEnergyDemand,
 )

@@ -6,6 +6,9 @@ class RenewableEnergyModel:
         self.WindEnergyModel = WindEnergyModel
         self.SolarEnergyModel = SolarEnergyModel
         self.dataValues = len(self.TidalEnergyModel.normalizedTidalData)
+        self.totalEnergy = None
+        self.energyDemand = None
+        self.netEnergyDemand = None
     def getPowerGeneration(self):
         tidalEnergyGeneration = self.TidalEnergyModel.getTidalEnergyGeneration()
         windEnergyGeneration = self.WindEnergyModel.getWindGeneration()
@@ -13,7 +16,15 @@ class RenewableEnergyModel:
         totalEnergy = [0]*self.dataValues
         for count in range(self.dataValues):
             totalEnergy[count] = tidalEnergyGeneration[count] + windEnergyGeneration[count] + solarEnergyGeneration[count]
+        self.totalEnergy = totalEnergy
         return totalEnergy
+    def getNetEnergyDemand(self, energyDemand, frequencyOfData):
+        self.energyDemand = normalizeDataSet(energyDemand, frequencyOfData)
+        netEnergyDemand = [0]*self.dataValues
+        for count in range(self.dataValues):
+            netEnergyDemand[count] = self.energyDemand[count] - self.totalEnergy[count]
+        self.netEnergyDemand = netEnergyDemand
+        return self.netEnergyDemand
 
 class TidalEnergyModel:
     def __init__(self, tidalData,isCSV, frequencyOfData):
