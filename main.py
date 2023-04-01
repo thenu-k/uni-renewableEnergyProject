@@ -33,8 +33,8 @@ renewableInstance = RenewableEnergyModel(tidalInstance, windInstance, solarInsta
 tidalEnergyGeneration = tidalInstance.getTidalEnergyGeneration()
 windEnergyGeneration = windInstance.getWindGeneration()
 solarEnergyGeneration = solarInstance.getSolarGeneration()
-totalEnergyGeneration = renewableInstance.getPowerGeneration()
-netEnergyDemand = renewableInstance.getNetEnergyDemand(
+totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
+netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
     energyDemand=energyDemandData,
     frequencyOfData=1,
 )

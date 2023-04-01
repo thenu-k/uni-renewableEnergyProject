@@ -6,25 +6,25 @@ class RenewableEnergyModel:
         self.WindEnergyModel = WindEnergyModel
         self.SolarEnergyModel = SolarEnergyModel
         self.dataValues = len(self.TidalEnergyModel.normalizedTidalData)
-        self.totalEnergy = None
-        self.energyDemand = None
-        self.netEnergyDemand = None
-    def getPowerGeneration(self):
-        tidalEnergyGeneration = self.TidalEnergyModel.getTidalEnergyGeneration()
-        windEnergyGeneration = self.WindEnergyModel.getWindGeneration()
-        solarEnergyGeneration = self.SolarEnergyModel.getSolarGeneration()
-        totalEnergy = [0]*self.dataValues
+        self.totalDailyEnergyProduction = None
+        self.dailyEnergyDemand = None
+        self.netDailyEnergyDemand = None
+    def getDailyTotalEnergyProduction(self):
+        dailyTidalEnergyProduction = self.TidalEnergyModel.getTidalEnergyGeneration()
+        dailyWindEnergyProduction = self.WindEnergyModel.getWindGeneration()
+        dailySolarEnergyProduction = self.SolarEnergyModel.getSolarGeneration()
+        totalDailyEnergyProduction = [0]*self.dataValues
         for count in range(self.dataValues):
-            totalEnergy[count] = tidalEnergyGeneration[count] + windEnergyGeneration[count] + solarEnergyGeneration[count]
-        self.totalEnergy = totalEnergy
-        return totalEnergy
-    def getNetEnergyDemand(self, energyDemand, frequencyOfData):
-        self.energyDemand = normalizeDataSet(energyDemand, frequencyOfData)
-        netEnergyDemand = [0]*self.dataValues
+            totalDailyEnergyProduction[count] = dailyTidalEnergyProduction[count] + dailyWindEnergyProduction[count] + dailySolarEnergyProduction[count]
+        self.totalDailyEnergyProduction = totalDailyEnergyProduction
+        return totalDailyEnergyProduction
+    def getNetDailyEnergyDemand(self, energyDemand, frequencyOfData):
+        self.dailyEnergyDemand = normalizeDataSet(energyDemand, frequencyOfData)
+        netDailyEnergyDemand = [0]*self.dataValues
         for count in range(self.dataValues):
-            netEnergyDemand[count] = self.energyDemand[count] - self.totalEnergy[count]
-        self.netEnergyDemand = netEnergyDemand
-        return self.netEnergyDemand
+            netDailyEnergyDemand[count] = self.dailyEnergyDemand[count] - self.totalDailyEnergyProduction[count]
+        self.netDailyEnergyDemand = netDailyEnergyDemand
+        return self.netDailyEnergyDemand
 
 class TidalEnergyModel:
     def __init__(self, tidalData,isCSV, frequencyOfData):
@@ -32,12 +32,12 @@ class TidalEnergyModel:
         self.frequencyOfData = frequencyOfData
         self.normalizedTidalData = normalizeDataSet(self.tidalData, self.frequencyOfData)
     def getTidalEnergyGeneration(self):
-        totalEnergy = [0]*len(self.normalizedTidalData)
+        dailyTotalEnergy = [0]*len(self.normalizedTidalData)
         count = 0
         for value in self.normalizedTidalData:
-            totalEnergy[count] += value * 3
+            dailyTotalEnergy[count] += value * 3
             count += 1
-        return totalEnergy
+        return dailyTotalEnergy
     
 class WindEnergyModel:
     def __init__(self, windData, frequencyOfData, isCSV):
@@ -45,12 +45,12 @@ class WindEnergyModel:
         self.frequencyOfData = frequencyOfData
         self.normalizedWindData = normalizeDataSet(self.windData, self.frequencyOfData)
     def getWindGeneration(self):
-        totalEnergy = [0]*len(self.normalizedWindData)
+        dailyTotalEnergy = [0]*len(self.normalizedWindData)
         count = 0
         for value in self.normalizedWindData:
-            totalEnergy[count] += value * 4
+            dailyTotalEnergy[count] += value * 4
             count += 1
-        return totalEnergy
+        return dailyTotalEnergy
     
 class SolarEnergyModel:
     def __init__(self, solarData, frequencyOfData, isCSV):
@@ -58,12 +58,12 @@ class SolarEnergyModel:
         self.frequencyOfData = frequencyOfData
         self.normalizedSolarData = normalizeDataSet(self.solarData, self.frequencyOfData)
     def getSolarGeneration(self):
-        totalEnergy = [0]*len(self.normalizedSolarData)
+        dailyTotalEnergy = [0]*len(self.normalizedSolarData)
         count = 0
         for value in self.normalizedSolarData:
-            totalEnergy[count] += value * 5
+            dailyTotalEnergy[count] += value * 5
             count += 1
-        return totalEnergy
+        return dailyTotalEnergy
     
 class EnergyStorage:
     def __init__(self, liquidDensity, accelerationDueToGravity, maxFlowRate, efficiency, maxTopVolume, maxBottomValue, turbinePower):
