@@ -5,14 +5,15 @@ class RenewableEnergyModel:
         self.TidalEnergyModel = TidalEnergyModel
         self.WindEnergyModel = WindEnergyModel
         self.SolarEnergyModel = SolarEnergyModel
+        self.EnergyStorage = EnergyStorage
         self.dataValues = len(self.TidalEnergyModel.normalizedTidalData)
         self.totalDailyEnergyProduction = None
         self.dailyEnergyDemand = None
         self.netDailyEnergyDemand = None
     def getDailyTotalEnergyProduction(self):
-        dailyTidalEnergyProduction = self.TidalEnergyModel.getTidalEnergyGeneration()
-        dailyWindEnergyProduction = self.WindEnergyModel.getWindGeneration()
-        dailySolarEnergyProduction = self.SolarEnergyModel.getSolarGeneration()
+        dailyTidalEnergyProduction = self.TidalEnergyModel.getDailyEnergyProduction()
+        dailyWindEnergyProduction = self.WindEnergyModel.getDailyEnergyProduction()
+        dailySolarEnergyProduction = self.SolarEnergyModel.getDailyEnergyProduction()
         totalDailyEnergyProduction = [0]*self.dataValues
         for count in range(self.dataValues):
             totalDailyEnergyProduction[count] = dailyTidalEnergyProduction[count] + dailyWindEnergyProduction[count] + dailySolarEnergyProduction[count]
@@ -25,13 +26,15 @@ class RenewableEnergyModel:
             netDailyEnergyDemand[count] = self.dailyEnergyDemand[count] - self.totalDailyEnergyProduction[count]
         self.netDailyEnergyDemand = netDailyEnergyDemand
         return self.netDailyEnergyDemand
+    def accountForEnergyStorage(self):
+        return None
 
 class TidalEnergyModel:
     def __init__(self, tidalData,isCSV, frequencyOfData):
         self.tidalData = tidalData
         self.frequencyOfData = frequencyOfData
         self.normalizedTidalData = normalizeDataSet(self.tidalData, self.frequencyOfData)
-    def getTidalEnergyGeneration(self):
+    def getDailyEnergyProduction(self):
         dailyTotalEnergy = [0]*len(self.normalizedTidalData)
         count = 0
         for value in self.normalizedTidalData:
@@ -44,7 +47,7 @@ class WindEnergyModel:
         self.windData = windData
         self.frequencyOfData = frequencyOfData
         self.normalizedWindData = normalizeDataSet(self.windData, self.frequencyOfData)
-    def getWindGeneration(self):
+    def getDailyEnergyProduction(self):
         dailyTotalEnergy = [0]*len(self.normalizedWindData)
         count = 0
         for value in self.normalizedWindData:
@@ -57,7 +60,7 @@ class SolarEnergyModel:
         self.solarData = solarData
         self.frequencyOfData = frequencyOfData
         self.normalizedSolarData = normalizeDataSet(self.solarData, self.frequencyOfData)
-    def getSolarGeneration(self):
+    def getDailyEnergyProduction(self):
         dailyTotalEnergy = [0]*len(self.normalizedSolarData)
         count = 0
         for value in self.normalizedSolarData:
@@ -66,13 +69,29 @@ class SolarEnergyModel:
         return dailyTotalEnergy
     
 class EnergyStorage:
-    def __init__(self, liquidDensity, accelerationDueToGravity, maxFlowRate, efficiency, maxTopVolume, maxBottomValue, turbinePower):
+    def __init__(self, liquidDensity, accelerationDueToGravity, maxFlowRate, efficiency, maxTopVolume, maxBottomValue, turbinePower, dataValues):
         self.liquidDensity = liquidDensity
         self.accelerationDueToGravity = accelerationDueToGravity
         self.maxFlowRate = maxFlowRate
         self.efficiency = efficiency
         self.maxTopVolume = maxTopVolume
+        self.currentTopVolume = None
         self.maxBottomValue = maxBottomValue
+        self.currentBottomValue = None
         self.turbinePower = turbinePower
-    def getStorageFacility():
+        self.dailyMaximumEnergyPossible = self.turbinePower * 24 * 60 * 60
+        self.dailyStorageEnergyUsage = [0]*dataValues
+    def updateTopVolume(self, newVolume):
+        self.currentTopVolume = newVolume
+    def updateBottomVolume(self, newVolume):
+        self.currentBottomValue = newVolume
+    def calculateWaterMovement(self, currentNetEnergyDemand):
+        energyRequired = True if currentNetEnergyDemand>0 else False
+        if currentNetEnergyDemand>self.dailyMaximumEnergyPossible:
+            energyMovement = self.dailyMaximumEnergyPossible
+        else:
+            energyMovement = currentNetEnergyDemand
+        waterMovement = energyMovement / (self.liquidDensity * self.accelerationDueToGravity)
         return None
+    
+# To do: Create buffer (lithium ion?) for energy storage

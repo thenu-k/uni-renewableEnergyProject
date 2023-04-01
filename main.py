@@ -26,17 +26,17 @@ storageInstance = EnergyStorage(
     maxTopVolume=100,
     maxBottomValue=100,
     turbinePower=100,
+    dataValues=len(tidalData)
 )
 
 # Connecting the facilities together
 renewableInstance = RenewableEnergyModel(tidalInstance, windInstance, solarInstance, storageInstance)
-tidalEnergyGeneration = tidalInstance.getTidalEnergyGeneration()
-windEnergyGeneration = windInstance.getWindGeneration()
-solarEnergyGeneration = solarInstance.getSolarGeneration()
+tidalEnergyGeneration = renewableInstance.TidalEnergyModel.getDailyEnergyProduction()
+windEnergyGeneration = renewableInstance.WindEnergyModel.getDailyEnergyProduction()
+solarEnergyGeneration = renewableInstance.SolarEnergyModel.getDailyEnergyProduction()
 totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
 netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
-    energyDemand=energyDemandData,
-    frequencyOfData=1,
+    energyDemand=energyDemandData, frequencyOfData=1,
 )
 
 # Plotting the data
