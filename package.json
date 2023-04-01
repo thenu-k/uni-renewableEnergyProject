@@ -1,0 +1,12 @@
+{
+  "name": "renewable-energy-model",
+  "version": "1.0.0",
+  "description": "A model to predict the renewable energy generation in St Andrews",
+  "main": "main.py",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "python main.py"
+  },
+  "author": "Thenu Kaluarachchige",
+  "license": "ISC"
+}
