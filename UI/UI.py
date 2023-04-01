@@ -30,5 +30,5 @@ def plotData(tidalEnergyGeneration, windEnergyGeneration, solarEnergyGeneration,
         return lines
 
     ani = animation.FuncAnimation(fig, update, frames=len(days), fargs=[days, energy1, energy2, energy3, energy4, lines], interval=50)
-    ani.save('EnergyProduction.gif')
+    ani.save('./Media/EnergyProduction.gif')
     plt.show()
