@@ -1,6 +1,6 @@
 ## PH1012 Renewable Energy Project
 <img src='./Media/readme.webp' style='height: 300px; width: auto'>
-<br><br>
+
 This repository contains the code for Group-11's PH1012 renewable energy report. The code is written in python and can be run using the command `python main.py` or `python3 main.py` depending on your operating system.
 
 ## Code Structure
