@@ -12,3 +12,6 @@ def normalizeDataSet(dataset, frequency):
             normalizedData[count] = dataset[i]
             count += 1
     return normalizedData
+
+def langrangianInterpolator(dataset, currFrequency, requiredFrequency, numValues):
+    pass

@@ -1,17 +1,21 @@
 from Model.Models import *
 from UI.UI import *
 from Data.Data import *
+from Data.helperFunctions import *
 
 # Instantiating the component facilities
 tidalInstance =  TidalEnergyModel(
     tidalData=tidalData, 
     isCSV=False,
+    unitCount = 10,
+    efficiency = 0.8,
     frequencyOfData=1,
     )
 windInstance = WindEnergyModel(
-    windData=windSpeedData, 
+    windData=None,
+    customDailyGenerationFunction=generateWindSpeedData,
     isCSV=False,
-    frequencyOfData=1,
+    frequencyOfData=None,
 )
 solarInstance = SolarEnergyModel(
     solarData=solarData, 
