@@ -68,7 +68,7 @@ def generateWindSpeedData():
     wind_data=average_wind*np.asarray(wind_data, dtype=float)
 
 
-    nmumber_of_turbines=7
+    nmumber_of_turbines=10
     efficiency_factor=0.4
     diameter=174
     air_density=1.225

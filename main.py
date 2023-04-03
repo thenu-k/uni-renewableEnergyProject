@@ -7,10 +7,12 @@ from Data.helperFunctions import *
 tidalInstance =  TidalEnergyModel(
     tidalData=tidalData, 
     isCSV=False,
-    unitCount = 40,
+    unitCount = 10,
     efficiency = 0.8,
-    bladeDiameter = 40,
+    bladeDiameter = 5,
     mediumDensity = 997.77,
+    accelerationDueToGravity=9.81,
+    headHeight=20,
     frequencyOfData=1,
 )
 windInstance = WindEnergyModel(

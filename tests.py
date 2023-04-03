@@ -1,4 +1,8 @@
-from Model.Models import *
+from Model.RenewableEnergyModel import RenewableEnergyModel
+from Model.ComponentModels.EnergyStorageModel import EnergyStorageModel
+from Model.ComponentModels.TidalEnergyModel import TidalEnergyModel
+from Model.ComponentModels.WindEnergyModel import WindEnergyModel
+from Model.ComponentModels.SolarEnergyModel import SolarEnergyModel
 from UI.UI import *
 from Data.Data import *
 from Data.helperFunctions import *
@@ -7,13 +11,13 @@ from Data.helperFunctions import *
 tidalInstance =  TidalEnergyModel(
     tidalData=tidalData, 
     isCSV=False,
-    unitCount = 1,
+    unitCount = 10,
     efficiency = 0.8,
-    bladeDiameter = 0.5,
+    bladeDiameter = 5,
     mediumDensity = 997.77,
     accelerationDueToGravity=9.81,
     frequencyOfData=1,
-    headHeight=2
+    headHeight=20
 )
 windInstance = WindEnergyModel(
     windData=None,
@@ -26,7 +30,7 @@ solarInstance = SolarEnergyModel(
     isCSV=False,
     frequencyOfData=1,
 )
-storageInstance = EnergyStorage(
+storageInstance = EnergyStorageModel(
     liquidDensity=1000,
     accelerationDueToGravity=9.81,
     maxFlowRate=100,
@@ -51,6 +55,6 @@ netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
 totalTest  = [windEnergyGeneration[count] + tidalEnergyGeneration[count] for count in range(336)]
 
 compareProd(
-    energyProd=tidalEnergyGeneration,
+    energyProd=totalTest,
     energyDemand=energyDemandData,
 )

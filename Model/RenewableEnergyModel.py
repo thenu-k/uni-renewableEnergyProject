@@ -2,11 +2,11 @@ from .helperFunctions import normalizeDataSet
 from math import pi
 
 class RenewableEnergyModel:
-    def __init__(self, TidalEnergyModel, WindEnergyModel, SolarEnergyModel, EnergyStorage):
+    def __init__(self, TidalEnergyModel, WindEnergyModel, SolarEnergyModel, EnergyStorageModel):
         self.TidalEnergyModel = TidalEnergyModel
         self.WindEnergyModel = WindEnergyModel
         self.SolarEnergyModel = SolarEnergyModel
-        self.EnergyStorage = EnergyStorage
+        self.EnergyStorageModel = EnergyStorageModel
         self.dataValues = len(self.TidalEnergyModel.normalizedTidalData)
         self.totalDailyEnergyProduction = None
         self.dailyEnergyDemand = None

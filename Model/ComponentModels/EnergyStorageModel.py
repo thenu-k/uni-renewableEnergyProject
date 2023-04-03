@@ -1,4 +1,4 @@
-class EnergyStorage:
+class EnergyStorageModel:
     def __init__(self, liquidDensity, accelerationDueToGravity, maxFlowRate, efficiency, maxTopVolume, maxBottomValue, turbinePower, dataValues):
         self.liquidDensity = liquidDensity
         self.accelerationDueToGravity = accelerationDueToGravity
