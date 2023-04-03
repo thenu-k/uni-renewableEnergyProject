@@ -42,5 +42,6 @@ def compareProd(energyProd, energyDemand):
 
     plt.xlabel("X-axis data")
     plt.ylabel("Y-axis data")
+    plt.ylim(0)
     plt.title('multiple plots')
     plt.show()

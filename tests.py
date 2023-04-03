@@ -7,11 +7,13 @@ from Data.helperFunctions import *
 tidalInstance =  TidalEnergyModel(
     tidalData=tidalData, 
     isCSV=False,
-    unitCount = 40,
+    unitCount = 1,
     efficiency = 0.8,
-    bladeDiameter = 40,
+    bladeDiameter = 0.5,
     mediumDensity = 997.77,
+    accelerationDueToGravity=9.81,
     frequencyOfData=1,
+    headHeight=2
 )
 windInstance = WindEnergyModel(
     windData=None,
@@ -44,7 +46,9 @@ netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
     energyDemand=energyDemandData, frequencyOfData=1,
 )
 
-print(renewableInstance.TidalEnergyModel.testSingleUnitEnergyProduction(velocity=1.15, isDaily=True, isYearly=False))
+# print(renewableInstance.TidalEnergyModel.testSingleUnitEnergyProduction(velocity=1.15, isDaily=True, isYearly=False))
+
+totalTest  = [windEnergyGeneration[count] + tidalEnergyGeneration[count] for count in range(336)]
 
 compareProd(
     energyProd=tidalEnergyGeneration,

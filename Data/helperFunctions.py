@@ -2,6 +2,8 @@ import numpy as np
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import random
+import csv
+from Model.helperFunctions import *
 
 '''
     Generate Energy Demand Data ======================================
@@ -58,4 +60,43 @@ def generateCurrentData():
     Generate Wind Speed Data ======================================
 '''
 def generateWindSpeedData():
-    return [10 for i in range(336)]
+    with open('Data/Files/heatmapData.csv', newline='') as csvfile:
+        r=csv.reader(csvfile, delimiter=',')
+        wind_data=np.transpose([i[1:] for i in list(r)[1:]])
+
+    average_wind=9.33    
+    wind_data=average_wind*np.asarray(wind_data, dtype=float)
+
+
+    nmumber_of_turbines=7
+    efficiency_factor=0.4
+    diameter=174
+    air_density=1.225
+
+    def energy_per_hour(v):
+        ##in kWh
+        return nmumber_of_turbines*efficiency_factor*air_density*v**3/2*np.pi*diameter**2/4000
+
+    def energy_per_month(month):
+        ##in GWh
+        sum=0
+        for v in month:
+            sum+=energy_per_hour(v)        
+        return sum*30/10**6
+
+    def energy_per_year(year):
+        ##in GWh
+        sum=0
+        for month in year:
+            sum+=energy_per_month(month)
+        return sum
+
+    monthly_energy=[energy_per_month(i)*1e9/30 for i in wind_data] #in GWh for the entire month so *1e9/30
+    x = np.array([28 * (1+i) for i in range(12)])
+    y= monthly_energy
+    normalizedData = [interp1d(x, y, fill_value='extrapolate')(i) for i in range(336)]
+    normalizedData = [normalizedDataValue + random.uniform(-normalizedDataValue*0.05, normalizedDataValue*0.05) for normalizedDataValue in normalizedData]
+    # plt.plot([count for count in range(12)], monthly_energy)
+    # plt.show()
+    # print(sum(normalizedData))
+    return normalizedData
