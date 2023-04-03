@@ -2,10 +2,10 @@ from ..helperFunctions import normalizeDataSet
 from math import pi
 
 class TidalEnergyModel:
-    def __init__(self, tidalData,isCSV, frequencyOfData, unitCount, efficiency, bladeDiameter, mediumDensity, headHeight, accelerationDueToGravity):
+    def __init__(self, tidalData:type[list[float]], unitCount:type[int], efficiency:type[float], bladeDiameter:type[float], mediumDensity:type[float], headHeight:type[float], accelerationDueToGravity:type[float]):
+        if efficiency > 1:
+            raise ValueError("Efficiency cannot be greater than 1")
         self.tidalData = tidalData
-        self.frequencyOfData = frequencyOfData
-        self.normalizedTidalData = normalizeDataSet(self.tidalData, self.frequencyOfData)
         self.unitCount = unitCount
         self.efficiency = efficiency
         self.bladeDiameter = bladeDiameter
@@ -13,14 +13,14 @@ class TidalEnergyModel:
         self.mediumDensity = mediumDensity
         self.accelerationDueToGravity = accelerationDueToGravity
         self.headHeight = headHeight
-        self.idealPowerPerUnit  = lambda currVelocity:  self.mediumDensity * self.bladeSweepArea * currVelocity * self.accelerationDueToGravity * self.headHeight
+    def getIdealPowerPerUnit(self, velocity):
+        return self.mediumDensity * self.bladeSweepArea * velocity * self.accelerationDueToGravity * self.headHeight
     def getDailyEnergyProduction(self):
-        dailyTotalEnergy = [0]*len(self.normalizedTidalData)
+        dailyTotalEnergy = [0]*len(self.tidalData)
         count = 0
-        for currentSpeedValue in self.normalizedTidalData:
-            dailyTotalEnergy[count] += 24 * self.unitCount * self.idealPowerPerUnit(currentSpeedValue) * self.efficiency 
+        for currentSpeedValue in self.tidalData:
+            dailyTotalEnergy[count] += 24 * self.unitCount * self.getIdealPowerPerUnit(currentSpeedValue) * self.efficiency 
             count += 1
-        print(sum(dailyTotalEnergy))
         return dailyTotalEnergy
     def testSingleUnitEnergyProduction(self, velocity, isDaily, isYearly):
         if isDaily:

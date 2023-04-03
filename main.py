@@ -1,4 +1,8 @@
-from Model.Models import *
+from Model.RenewableEnergyModel import RenewableEnergyModel
+from Model.ComponentModels.EnergyStorageModel import EnergyStorageModel
+from Model.ComponentModels.TidalEnergyModel import TidalEnergyModel
+from Model.ComponentModels.WindEnergyModel import WindEnergyModel
+from Model.ComponentModels.SolarEnergyModel import SolarEnergyModel
 from UI.UI import *
 from Data.Data import *
 from Data.helperFunctions import *
@@ -6,27 +10,21 @@ from Data.helperFunctions import *
 # Instantiating the component facilities
 tidalInstance =  TidalEnergyModel(
     tidalData=tidalData, 
-    isCSV=False,
     unitCount = 10,
     efficiency = 0.8,
     bladeDiameter = 5,
     mediumDensity = 997.77,
     accelerationDueToGravity=9.81,
-    headHeight=20,
-    frequencyOfData=1,
+    headHeight=20
 )
 windInstance = WindEnergyModel(
     windData=None,
     customDailyGenerationFunction=generateWindSpeedData,
-    isCSV=False,
-    frequencyOfData=None,
 )
 solarInstance = SolarEnergyModel(
     solarData=solarData, 
-    isCSV=False,
-    frequencyOfData=1,
 )
-storageInstance = EnergyStorage(
+storageInstance = EnergyStorageModel(
     liquidDensity=1000,
     accelerationDueToGravity=9.81,
     maxFlowRate=100,

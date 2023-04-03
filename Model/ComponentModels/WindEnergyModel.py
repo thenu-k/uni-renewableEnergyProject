@@ -1,17 +1,15 @@
 from ..helperFunctions import normalizeDataSet
 
 class WindEnergyModel:
-    def __init__(self, windData, frequencyOfData, isCSV, customDailyGenerationFunction):
+    # create a type of a function that returns a list of integers: type[function: list[int]]
+    def __init__(self, windData: type[list[float]], customDailyGenerationFunction):
         self.windData = windData
-        self.frequencyOfData = frequencyOfData
-        if not customDailyGenerationFunction:
-            self.normalizedWindData = normalizeDataSet(self.windData, self.frequencyOfData)
         self.customDailyGenerationFunction = customDailyGenerationFunction
     def getDailyEnergyProduction(self):
         if not self.customDailyGenerationFunction:
-            dailyTotalEnergy = [0]*len(self.normalizedWindData)
+            dailyTotalEnergy = [0]*self.windData
             count = 0
-            for value in self.normalizedWindData:
+            for value in self.windData:
                 dailyTotalEnergy[count] += value * 4
                 count += 1
             return dailyTotalEnergy

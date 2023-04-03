@@ -10,25 +10,19 @@ from Data.helperFunctions import *
 # Instantiating the component facilities
 tidalInstance =  TidalEnergyModel(
     tidalData=tidalData, 
-    isCSV=False,
     unitCount = 10,
     efficiency = 0.8,
-    bladeDiameter = 5,
+    bladeDiameter = 0.15,
     mediumDensity = 997.77,
     accelerationDueToGravity=9.81,
-    frequencyOfData=1,
     headHeight=20
 )
 windInstance = WindEnergyModel(
     windData=None,
     customDailyGenerationFunction=generateWindSpeedData,
-    isCSV=False,
-    frequencyOfData=None,
 )
 solarInstance = SolarEnergyModel(
     solarData=solarData, 
-    isCSV=False,
-    frequencyOfData=1,
 )
 storageInstance = EnergyStorageModel(
     liquidDensity=1000,
@@ -49,12 +43,13 @@ totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
 netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
     energyDemand=energyDemandData, frequencyOfData=1,
 )
+print(renewableInstance.TidalEnergyModel.getIdealPowerPerUnit(1.15) * 336 * 24 * 0.87)
 
 # print(renewableInstance.TidalEnergyModel.testSingleUnitEnergyProduction(velocity=1.15, isDaily=True, isYearly=False))
 
 totalTest  = [windEnergyGeneration[count] + tidalEnergyGeneration[count] for count in range(336)]
 
 compareProd(
-    energyProd=totalTest,
+    energyProd=tidalData,
     energyDemand=energyDemandData,
 )

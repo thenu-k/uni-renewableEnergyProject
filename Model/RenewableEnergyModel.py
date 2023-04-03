@@ -1,20 +1,35 @@
 from .helperFunctions import normalizeDataSet
 from math import pi
+from .ComponentModels.TidalEnergyModel import TidalEnergyModel
+from .ComponentModels.WindEnergyModel import WindEnergyModel
+from .ComponentModels.SolarEnergyModel import SolarEnergyModel
+from .ComponentModels.EnergyStorageModel import EnergyStorageModel
 
 class RenewableEnergyModel:
-    def __init__(self, TidalEnergyModel, WindEnergyModel, SolarEnergyModel, EnergyStorageModel):
+    def __init__(self, TidalEnergyModel: type[TidalEnergyModel], WindEnergyModel: type[WindEnergyModel], SolarEnergyModel: type[SolarEnergyModel], EnergyStorageModel: type[EnergyStorageModel]):
+        if not TidalEnergyModel and not WindEnergyModel and not SolarEnergyModel:
+            raise Exception("No energy model was provided")
         self.TidalEnergyModel = TidalEnergyModel
         self.WindEnergyModel = WindEnergyModel
         self.SolarEnergyModel = SolarEnergyModel
         self.EnergyStorageModel = EnergyStorageModel
-        self.dataValues = len(self.TidalEnergyModel.normalizedTidalData)
+        self.dataValues = len(self.TidalEnergyModel.tidalData)
         self.totalDailyEnergyProduction = None
         self.dailyEnergyDemand = None
         self.netDailyEnergyDemand = None
     def getDailyTotalEnergyProduction(self):
-        dailyTidalEnergyProduction = self.TidalEnergyModel.getDailyEnergyProduction()
-        dailyWindEnergyProduction = self.WindEnergyModel.getDailyEnergyProduction()
-        dailySolarEnergyProduction = self.SolarEnergyModel.getDailyEnergyProduction()
+        if self.TidalEnergyModel:
+            dailyTidalEnergyProduction = self.TidalEnergyModel.getDailyEnergyProduction()
+        else:
+            dailyTidalEnergyProduction = [0]*self.dataValues
+        if self.SolarEnergyModel:
+            dailySolarEnergyProduction = self.SolarEnergyModel.getDailyEnergyProduction()
+        else:
+            dailySolarEnergyProduction = [0]*self.dataValues
+        if self.WindEnergyModel:
+            dailyWindEnergyProduction = self.WindEnergyModel.getDailyEnergyProduction()
+        else:
+            dailyWindEnergyProduction = [0]*self.dataValues
         totalDailyEnergyProduction = [0]*self.dataValues
         for count in range(self.dataValues):
             totalDailyEnergyProduction[count] = dailyTidalEnergyProduction[count] + dailyWindEnergyProduction[count] + dailySolarEnergyProduction[count]
