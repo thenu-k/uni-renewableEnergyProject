@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 windSpeedData = [(1 - math.cos(2 * math.pi * i / 336))*2 + random.uniform(-1,1 ) for i in range(336)] 
 
 # get 336 random values between 0 and 10
-with open('./Data/Files/currentSpeedConstant.csv', 'r') as f:
+with open('./Data/Files/currentSpeed.csv', 'r') as f:
         tidalData = f.read().split(',')
         tidalData = [float(i) for i in tidalData]
 

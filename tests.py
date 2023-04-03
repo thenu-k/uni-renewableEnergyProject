@@ -44,11 +44,9 @@ netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
     energyDemand=energyDemandData, frequencyOfData=1,
 )
 
-# Plotting the data
-plotData(
-    tidalEnergyGeneration=tidalEnergyGeneration,
-    windEnergyGeneration=windEnergyGeneration,
-    solarEnergyGeneration=solarEnergyGeneration,
-    totalEnergyGeneration=totalEnergyGeneration,
-    netEnergyDemand=netEnergyDemand,
+print(renewableInstance.TidalEnergyModel.testSingleUnitEnergyProduction(velocity=1.15, isDaily=True, isYearly=False))
+
+compareProd(
+    energyProd=tidalEnergyGeneration,
+    energyDemand=energyDemandData,
 )

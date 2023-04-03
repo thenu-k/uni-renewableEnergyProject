@@ -48,6 +48,11 @@ class TidalEnergyModel:
             dailyTotalEnergy[count] += 24 * self.unitCount * self.efficiency * self.idealPowerPerUnit(currentSpeedValue)
             count += 1
         return dailyTotalEnergy
+    def testSingleUnitEnergyProduction(self, velocity, isDaily, isYearly):
+        if isDaily:
+            return 24 * self.unitCount * self.efficiency * self.idealPowerPerUnit(velocity)
+        elif isYearly:
+            return 365 * 24 * self.unitCount * self.efficiency * self.idealPowerPerUnit(velocity)
     
 class WindEnergyModel:
     def __init__(self, windData, frequencyOfData, isCSV, customDailyGenerationFunction):
