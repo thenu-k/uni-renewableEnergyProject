@@ -33,3 +33,14 @@ def plotData(tidalEnergyGeneration, windEnergyGeneration, solarEnergyGeneration,
     ani = animation.FuncAnimation(fig, update, frames=len(days), fargs=[days, energy1, energy2, energy3, energy4, lines], interval=50)
     ani.save('./Media/EnergyProduction.gif')
     plt.show()
+
+
+def compareProd(energyProd, energyDemand):
+    days = np.arange(1, len(energyProd)+1)
+    plt.plot(days, energyDemand, color='b')
+    plt.plot(days, energyProd, color='r')
+
+    plt.xlabel("X-axis data")
+    plt.ylabel("Y-axis data")
+    plt.title('multiple plots')
+    plt.show()

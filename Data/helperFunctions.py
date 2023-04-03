@@ -35,7 +35,7 @@ def interpolateEnergyData():
     An error is then added to each value using a uniform distribution.
 '''
 def generateCurrentData():
-    currentSpeedData = [0]*336
+    currentSpeedData = [0 for i in range(336)]
     for i in range(int(336/7)):
         if i % 2 == 0:
             # add random error to the current speed
@@ -43,15 +43,16 @@ def generateCurrentData():
         else:
             currentSpeedData[i*7:i*7+7] = [0.6+ random.uniform(-0.1, 0.1) for i in range(7)]
     x_values = np.linspace(0, 336, num=336)
-    y_values = [currentSpeedData for currentSpeedData in currentSpeedData]
-    with open('./Data/Files/currentSpeed.csv', 'w') as f:
-        for item in y_values:
+    with open('./Data/Files/currentSpeedConstant.csv', 'w') as f:
+        count = 0
+        for item in currentSpeedData:
             # remove comman from last item
-            if item == y_values[-1]:
+            if count == len(currentSpeedData)-1:
                 f.write("%s" % item)
             else:
                 f.write("%s," % item)
-    plt.plot(x_values, y_values)
+            count += 1
+    plt.plot(x_values, currentSpeedData)
     plt.show()
 '''
     Generate Wind Speed Data ======================================

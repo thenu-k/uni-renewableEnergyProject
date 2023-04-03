@@ -7,10 +7,12 @@ from Data.helperFunctions import *
 tidalInstance =  TidalEnergyModel(
     tidalData=tidalData, 
     isCSV=False,
-    unitCount = 10,
+    unitCount = 1,
     efficiency = 0.8,
+    bladeDiameter = 20,
+    mediumDensity = 997.77,
     frequencyOfData=1,
-    )
+)
 windInstance = WindEnergyModel(
     windData=None,
     customDailyGenerationFunction=generateWindSpeedData,
@@ -32,7 +34,6 @@ storageInstance = EnergyStorage(
     turbinePower=100,
     dataValues=len(tidalData)
 )
-
 # Connecting the facilities together
 renewableInstance = RenewableEnergyModel(tidalInstance, windInstance, solarInstance, storageInstance)
 tidalEnergyGeneration = renewableInstance.TidalEnergyModel.getDailyEnergyProduction()
@@ -42,12 +43,17 @@ totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
 netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
     energyDemand=energyDemandData, frequencyOfData=1,
 )
+print(sum(tidalEnergyGeneration))
 
 # Plotting the data
-plotData(
-    tidalEnergyGeneration=tidalEnergyGeneration,
-    windEnergyGeneration=windEnergyGeneration,
-    solarEnergyGeneration=solarEnergyGeneration,
-    totalEnergyGeneration=totalEnergyGeneration,
-    netEnergyDemand=netEnergyDemand,
+# plotData(
+#     tidalEnergyGeneration=tidalEnergyGeneration,
+#     windEnergyGeneration=windEnergyGeneration,
+#     solarEnergyGeneration=solarEnergyGeneration,
+#     totalEnergyGeneration=totalEnergyGeneration,
+#     netEnergyDemand=netEnergyDemand,
+# )
+compareProd(
+    energyProd=tidalEnergyGeneration,
+    energyDemand=energyDemandData,
 )

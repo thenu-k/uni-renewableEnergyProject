@@ -1,4 +1,5 @@
 from .helperFunctions import normalizeDataSet
+from math import pi
 
 class RenewableEnergyModel:
     def __init__(self, TidalEnergyModel, WindEnergyModel, SolarEnergyModel, EnergyStorage):
@@ -30,15 +31,21 @@ class RenewableEnergyModel:
         return None
 
 class TidalEnergyModel:
-    def __init__(self, tidalData,isCSV, frequencyOfData):
+    def __init__(self, tidalData,isCSV, frequencyOfData, unitCount, efficiency, bladeDiameter, mediumDensity):
         self.tidalData = tidalData
         self.frequencyOfData = frequencyOfData
         self.normalizedTidalData = normalizeDataSet(self.tidalData, self.frequencyOfData)
+        self.unitCount = unitCount
+        self.efficiency = efficiency
+        self.bladeDiameter = bladeDiameter
+        self.bladeSweepArea = pi * (self.bladeDiameter/2)**2
+        self.mediumDensity = mediumDensity
+        self.idealPowerPerUnit  = lambda currVelocity: 0.5 * self.mediumDensity * self.bladeSweepArea * currVelocity**3
     def getDailyEnergyProduction(self):
         dailyTotalEnergy = [0]*len(self.normalizedTidalData)
         count = 0
-        for value in self.normalizedTidalData:
-            dailyTotalEnergy[count] += value * 3
+        for currentSpeedValue in self.normalizedTidalData:
+            dailyTotalEnergy[count] += 24 * self.unitCount * self.efficiency * self.idealPowerPerUnit(currentSpeedValue)
             count += 1
         return dailyTotalEnergy
     
