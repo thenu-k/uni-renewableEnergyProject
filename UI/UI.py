@@ -35,11 +35,18 @@ def plotData(tidalEnergyGeneration, windEnergyGeneration, solarEnergyGeneration,
     plt.show()
 
 
-def compareProd(energyProd, energyDemand):
+def compareProd(energyProd,energyProd2,energyTotal, energyDemand, energyDefecit):
     days = np.arange(1, len(energyProd)+1)
     plt.plot(days, energyDemand, color='b')
-    plt.plot(days, energyProd, color='r')
-
+    if energyProd:
+        plt.plot(days, energyProd, color='#AAAAAA', linestyle='dotted')
+    if energyProd2:
+        # hex value for dark gray: #AAAAAA
+        plt.plot(days, energyProd2, color='#AAAAAA', linestyle='dotted')
+    if energyTotal:
+        plt.plot(days, energyTotal, color='r')
+    if energyDefecit:
+        plt.plot(days, energyDefecit, color='g')
     plt.xlabel("X-axis data")
     plt.ylabel("Y-axis data")
     plt.ylim(0)
