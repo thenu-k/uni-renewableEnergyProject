@@ -25,7 +25,6 @@ class TidalEnergyModel:
         if self.customPower:
             raise ValueError("Custom power cannot be used with this function")
         if self.isCrossFlow:
-            print('using cross flow')
             return self.mediumDensity * self.bladeSweepArea * velocity * self.accelerationDueToGravity * self.headHeight
         else:
             return self.mediumDensity * self.bladeSweepArea * velocity**3 * 0.5
