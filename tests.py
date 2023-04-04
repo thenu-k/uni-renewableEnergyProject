@@ -22,8 +22,12 @@ tidalInstance =  TidalEnergyModel(
     customPower=None,
 )
 windInstance = WindEnergyModel(
-    windData=None,
-    customDailyGenerationFunction=generateWindSpeedData,
+    windData=windSpeedData,
+    unitCount=10,
+    efficiency=0.4,
+    bladeDiameter=174,
+    mediumDensity=1.225,
+    customDailyGenerationFunction=None,
 )
 solarInstance = SolarEnergyModel(
     solarData=solarData, 
@@ -60,9 +64,9 @@ print(formatter(sum(netEnergyDemand)))
 # print(formatter(renewableInstance.TidalEnergyModel.getIdealPowerPerUnit((1.15+0.6)/2)*336*24*0.87))
 
 compareProd(
-    energyProd=tidalEnergyGeneration,
-    energyProd2 = windEnergyGeneration,
-    energyDefecit = netEnergyDemand,
-    energyTotal=totalTest,
+    energyProd=windEnergyGeneration,
+    energyProd2 = None,
+    energyDefecit = None,
+    energyTotal=None,
     energyDemand=energyDemandData,
 )

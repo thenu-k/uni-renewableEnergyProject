@@ -59,7 +59,7 @@ def generateCurrentData():
 '''
     Generate Wind Speed Data ======================================
 '''
-def generateWindSpeedData():
+def generateWindEnergyData():
     with open('Data/Files/heatmapData.csv', newline='') as csvfile:
         r=csv.reader(csvfile, delimiter=',')
         wind_data=np.transpose([i[1:] for i in list(r)[1:]])
@@ -111,20 +111,19 @@ def generateWindSpeedData():
     monthsInDayValues = np.array([28 * (1+i) for i in range(12)])
     values =  [interp1d(monthsInDayValues, windData, fill_value='extrapolate')(i) for i in range(336)]
     x_values = np.linspace(0, 336, num=336)
-    y_values = [(value + random.uniform(-value*0.05, value*0.05)) for value in values]
-    with open('Files/windSpeed.csv', 'w') as f:
-        for item in y_values:
-            if item == y_values[-1]:
-                f.write("%s" % item)
-            else:
-                f.write("%s," % item)
+    y_values = [(value + random.uniform(-value*0.005, value*0.005)) for value in values]
     plt.plot(x_values, y_values)
     plt.show()
     # create csv
-    # with open('Files/windSpeed.csv', 'w') as f:
-    #     for item in windData:
-    #         if item == windData[-1]:
-    #             f.write("%s" % item)
-    #         else:
-    #             f.write("%s," % item)
-generateWindSpeedData()
+    with open('Files/windSpeed.csv', 'w') as f:
+        count = 0
+        for item in y_values:
+            # remove comman from last item
+            if count == len(y_values)-1:
+                f.write("%s" % item)
+            else:
+                f.write("%s," % item)
+            count += 1
+# generateWindSpeedData()
+    
+

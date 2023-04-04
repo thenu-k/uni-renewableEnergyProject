@@ -19,3 +19,8 @@ solarData = [abs(math.cos(2 * math.pi * i / 336)) + random.uniform(-0.1, 0.1) fo
 with open('./Data/Files/energyDemand.csv', 'r') as f:
         energyDemandData = f.read().split(',')
         energyDemandData = [float(i) for i in energyDemandData]
+
+# Wind speed data
+with open('./Data/Files/windSpeed.csv', 'r') as f:
+        windSpeedData = f.read().split(',')
+        windSpeedData = [float(i) for i in windSpeedData]
