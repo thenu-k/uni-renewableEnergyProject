@@ -11,7 +11,7 @@ formatter = mpl.ticker.EngFormatter()
 
 # Instantiating the component facilities
 tidalInstance =  TidalEnergyModel(
-    tidalData=tidalData, 
+    tidalData=retrieveTidalData(error=0), 
     unitCount = 5,
     efficiency = 0.87,
     bladeDiameter = 8,
@@ -22,7 +22,7 @@ tidalInstance =  TidalEnergyModel(
     customPower=None,
 )
 windInstance = WindEnergyModel(
-    windData=windSpeedData,
+    windData=retrieveWindSpeedData(error=0),
     unitCount=10,
     efficiency=0.4,
     bladeDiameter=174,
@@ -40,17 +40,15 @@ storageInstance = EnergyStorageModel(
     maxTopVolume=100,
     maxBottomValue=100,
     turbinePower=100000,
-    dataValues=len(tidalData)
+    dataValues=len(retrieveWindSpeedData(error=0.005))
 )
 # Connecting the facilities together
-renewableInstance = RenewableEnergyModel(tidalInstance, windInstance, solarInstance, storageInstance)
+renewableInstance = RenewableEnergyModel(tidalInstance, windInstance, solarInstance, storageInstance, retrieveEnergyDemandData(error=0))
 tidalEnergyGeneration = renewableInstance.TidalEnergyModel.getDailyEnergyProduction()
 windEnergyGeneration = renewableInstance.WindEnergyModel.getDailyEnergyProduction()
 solarEnergyGeneration = renewableInstance.SolarEnergyModel.getDailyEnergyProduction()
 totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
-netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(
-    energyDemand=energyDemandData, frequencyOfData=1,
-)
+netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(frequencyOfData=1)
 
 # waterMovement = renewableInstance.EnergyStorageModel.accountForStorage(netEnergyDemand, assumeUnlimitedWater=True)
 # print(waterMovement)
@@ -65,8 +63,8 @@ print(formatter(sum(netEnergyDemand)))
 
 compareProd(
     energyProd=windEnergyGeneration,
-    energyProd2 = None,
+    energyProd2 = tidalEnergyGeneration,
     energyDefecit = None,
-    energyTotal=None,
-    energyDemand=energyDemandData,
+    energyTotal=renewableInstance.getDailyTotalEnergyProduction(),
+    energyDemand=renewableInstance.energyDemand,
 )

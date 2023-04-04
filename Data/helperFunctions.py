@@ -11,7 +11,7 @@ import csv
     This function interpolates the data to get a value for every day, assuming a month has 28 days.
     An error of up to 5% is added to each value using a uniform distribution.
 '''
-def interpolateEnergyData():
+def generateEnergyDemandData(error=0.05):
     with open('./Data/Files/energyConsumption.csv', 'r') as f:
         y = f.read().split(',')
         y = [float(i) for i in y]
@@ -22,42 +22,75 @@ def interpolateEnergyData():
     offset = townTotal/sum(values)
     values = [offset * values[i] for i in range(len(values))]
     x_values = np.linspace(0, 336, num=336)
-    y_values = [(value + random.uniform(-value*0.05, value*0.05)) for value in values]
-    with open('./Data/Files/energyDemand.csv', 'w') as f:
-        for item in y_values:
-            if item == y_values[-1]:
-                f.write("%s" % item)
-            else:
-                f.write("%s," % item)
-    plt.plot(x_values, y_values)
-    plt.show()
+    y_values = [(value + random.uniform(-value*error, value*error)) for value in values]
+    # with open('./Data/Files/energyDemand.csv', 'w') as f:
+    #     for item in y_values:
+    #         if item == y_values[-1]:
+    #             f.write("%s" % item)
+    #         else:
+    #             f.write("%s," % item)
+    # plt.plot(x_values, y_values)
+    # plt.show()
+    return y_values
 '''
     Generate Current Speed Data ======================================
     Sea current speeds alternate between 1.15 m/s and 0.6 m/s every week.
     An error is then added to each value using a uniform distribution.
 '''
-def generateCurrentData():
+def generateCurrentData(error:type[float]):
     currentSpeedData = [0 for i in range(336)]
+    topCurrentSpeed = 1.15
+    bottomCurrentSpeed = 0.6
     for i in range(int(336/7)):
         if i % 2 == 0:
             # add random error to the current speed
-            currentSpeedData[i*7:i*7+7] = [1.15 + random.uniform(-0.1, 0.1) for i in range(7)]
+            currentSpeedData[i*7:i*7+7] = [topCurrentSpeed + random.uniform(-topCurrentSpeed*error, topCurrentSpeed*error) for i in range(7)]
         else:
-            currentSpeedData[i*7:i*7+7] = [0.6+ random.uniform(-0.1, 0.1) for i in range(7)]
+            currentSpeedData[i*7:i*7+7] = [bottomCurrentSpeed+ random.uniform(-bottomCurrentSpeed*error, bottomCurrentSpeed*error) for i in range(7)]
     x_values = np.linspace(0, 336, num=336)
-    with open('./Data/Files/currentSpeedConstant.csv', 'w') as f:
-        count = 0
-        for item in currentSpeedData:
-            # remove comman from last item
-            if count == len(currentSpeedData)-1:
-                f.write("%s" % item)
-            else:
-                f.write("%s," % item)
-            count += 1
-    plt.plot(x_values, currentSpeedData)
-    plt.show()
+    # with open('./Data/Files/currentSpeedConstant.csv', 'w') as f:
+    #     count = 0
+    #     for item in currentSpeedData:
+    #         # remove comman from last item
+    #         if count == len(currentSpeedData)-1:
+    #             f.write("%s" % item)
+    #         else:
+    #             f.write("%s," % item)
+    #         count += 1
+    # plt.plot(x_values, currentSpeedData)
+    # plt.show()
+    return currentSpeedData
 '''
     Generate Wind Speed Data ======================================
+'''
+def generateWindSpeedData(error=0.005):
+    with open('./Data/Files/heatmapData.csv', newline='') as csvfile:
+        r=csv.reader(csvfile, delimiter=',')
+        windData=np.transpose([i[1:] for i in list(r)[1:]])
+    average_wind=9.33    
+    windData=(average_wind*np.asarray(windData, dtype=float))
+    windData = [sum(windData[count])/len(windData[count]) for count in range(len(windData))]
+    monthsInDayValues = np.array([28 * (1+i) for i in range(12)])
+    values =  [interp1d(monthsInDayValues, windData, fill_value='extrapolate')(i) for i in range(336)]
+    x_values = np.linspace(0, 336, num=336)
+    y_values = [(value + random.uniform(-value*error, value*error)) for value in values]
+    # plt.plot(x_values, y_values)
+    # plt.show()
+    # create csv
+    # with open('./Data/Files/windSpeed.csv', 'w') as f:
+    #     count = 0
+    #     for item in y_values:
+    #         # remove comman from last item
+    #         if count == len(y_values)-1:
+    #             f.write("%s" % item)
+    #         else:
+    #             f.write("%s," % item)
+    #         count += 1
+    return y_values
+
+
+'''
+    Custom Wind Energy Generation Function ======================================
 '''
 def generateWindEnergyData():
     with open('Data/Files/heatmapData.csv', newline='') as csvfile:
@@ -100,30 +133,4 @@ def generateWindEnergyData():
     # plt.show()
     # print(sum(normalizedData))
     return normalizedData
-
-def generateWindSpeedData():
-    with open('Files/heatmapData.csv', newline='') as csvfile:
-        r=csv.reader(csvfile, delimiter=',')
-        windData=np.transpose([i[1:] for i in list(r)[1:]])
-    average_wind=9.33    
-    windData=(average_wind*np.asarray(windData, dtype=float))
-    windData = [sum(windData[count])/len(windData[count]) for count in range(len(windData))]
-    monthsInDayValues = np.array([28 * (1+i) for i in range(12)])
-    values =  [interp1d(monthsInDayValues, windData, fill_value='extrapolate')(i) for i in range(336)]
-    x_values = np.linspace(0, 336, num=336)
-    y_values = [(value + random.uniform(-value*0.005, value*0.005)) for value in values]
-    plt.plot(x_values, y_values)
-    plt.show()
-    # create csv
-    with open('Files/windSpeed.csv', 'w') as f:
-        count = 0
-        for item in y_values:
-            # remove comman from last item
-            if count == len(y_values)-1:
-                f.write("%s" % item)
-            else:
-                f.write("%s," % item)
-            count += 1
-# generateWindSpeedData()
-    
 

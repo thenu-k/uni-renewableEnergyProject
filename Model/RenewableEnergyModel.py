@@ -6,7 +6,7 @@ from .ComponentModels.SolarEnergyModel import SolarEnergyModel
 from .ComponentModels.EnergyStorageModel import EnergyStorageModel
 
 class RenewableEnergyModel:
-    def __init__(self, TidalEnergyModel: type[TidalEnergyModel], WindEnergyModel: type[WindEnergyModel], SolarEnergyModel: type[SolarEnergyModel], EnergyStorageModel: type[EnergyStorageModel]):
+    def __init__(self, TidalEnergyModel: type[TidalEnergyModel], WindEnergyModel: type[WindEnergyModel], SolarEnergyModel: type[SolarEnergyModel], EnergyStorageModel: type[EnergyStorageModel], energyDemand: type[list]):
         if not TidalEnergyModel and not WindEnergyModel and not SolarEnergyModel:
             raise Exception("No energy model was provided")
         self.TidalEnergyModel = TidalEnergyModel
@@ -15,7 +15,7 @@ class RenewableEnergyModel:
         self.EnergyStorageModel = EnergyStorageModel
         self.dataValues = len(self.TidalEnergyModel.tidalData)
         self.totalDailyEnergyProduction = None
-        self.dailyEnergyDemand = None
+        self.energyDemand = energyDemand
         self.netDailyEnergyDemand = None
     def getDailyTotalEnergyProduction(self):
         if self.TidalEnergyModel:
@@ -35,12 +35,10 @@ class RenewableEnergyModel:
             totalDailyEnergyProduction[count] = dailyTidalEnergyProduction[count] + dailyWindEnergyProduction[count] + dailySolarEnergyProduction[count]
         self.totalDailyEnergyProduction = totalDailyEnergyProduction
         return totalDailyEnergyProduction
-    def getNetDailyEnergyDemand(self, energyDemand, frequencyOfData):
-        self.dailyEnergyDemand = normalizeDataSet(energyDemand, frequencyOfData)
+    def getNetDailyEnergyDemand(self, frequencyOfData):
         netDailyEnergyDemand = [0]*self.dataValues
         for count in range(self.dataValues):
-            netDailyEnergyDemand[count] = self.dailyEnergyDemand[count] - self.totalDailyEnergyProduction[count]
-        self.netDailyEnergyDemand = netDailyEnergyDemand
-        return self.netDailyEnergyDemand
+            netDailyEnergyDemand[count] = self.energyDemand[count] - self.totalDailyEnergyProduction[count]
+        return netDailyEnergyDemand
     def accountForEnergyStorage(self):
         return None
