@@ -17,7 +17,7 @@ tidalInstance =  TidalEnergyModel(
         error=error,
         valuesRequired=numDataPoints,
     ), 
-    unitCount = 5,
+    unitCount = 0,
     efficiency = 0.87,
     bladeDiameter = 8,
     mediumDensity = 997.77,
@@ -41,16 +41,18 @@ windInstance = WindEnergyModel(
 )
 solarInstance = SolarEnergyModel(
     solarData=Data.retrieveSolarData(error=0),
+    customPower=450,
+    unitCount=5000,
 )
 storageInstance = EnergyStorageModel(
     liquidDensity=1000,
     accelerationDueToGravity=9.81,
     maxFlowRate=100,
     efficiency=0.5,
-    maxTopVolume=1000,
-    currentTopVolume=100,
-    maxBottomValue=1000,
-    currentBottomValue=100,
+    maxTopVolume=80,
+    currentTopVolume=50,
+    maxBottomValue=80,
+    currentBottomValue=50,
     heightDifference=250,
     turbinePower=1000,
     dataValues=numDataPoints
@@ -59,7 +61,7 @@ storageInstance = EnergyStorageModel(
 renewableInstance = RenewableEnergyModel(
     TidalEnergyModel=tidalInstance,
     WindEnergyModel=windInstance,
-    SolarEnergyModel=None,
+    SolarEnergyModel=solarInstance,
     EnergyStorageModel=storageInstance,
     dataValues=numDataPoints,
     energyDemand=Data.generateEnergyDemandData(
@@ -71,6 +73,7 @@ renewableInstance = RenewableEnergyModel(
 )
 tidalEnergyGeneration = renewableInstance.TidalEnergyModel.getDailyEnergyProduction()
 windEnergyGeneration = renewableInstance.WindEnergyModel.getDailyEnergyProduction()
+solarEnergyGeneration = renewableInstance.SolarEnergyModel.getDailyEnergyProduction()
 totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
 netEnergyDemand = renewableInstance.getNetDailyEnergyDemand()
 
@@ -78,15 +81,16 @@ netEnergyDemand = renewableInstance.getNetDailyEnergyDemand()
 totalTest  = [windEnergyGeneration[count] + tidalEnergyGeneration[count] for count in range(336)]
 # print(formatter(windEnergyGeneration[359]))
 
+
 # compareProd(
 #     energyProd=windEnergyGeneration,
-#     energyProd2 = tidalEnergyGeneration,
-#     energyDefecit = tidalEnergyGeneration,
-#     energyTotal=windEnergyGeneration,
+#     energyProd2 = solarEnergyGeneration,
+#     energyDefecit = None,
+#     energyTotal=solarEnergyGeneration,
 #     energyDemand=renewableInstance.energyDemand,
 # )
 
 print(renewableInstance.EnergyStorageModel.accountForStorage(
-    netEnergyDemand=[24000, -12000],
+    netEnergyDemand=[24000, -24000],
     assumeUnlimitedWater=False,
 ))

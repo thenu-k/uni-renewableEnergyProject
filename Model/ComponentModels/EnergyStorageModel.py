@@ -11,6 +11,7 @@ class EnergyStorageModel:
         self.turbinePower = turbinePower
         self.dailyMaximumEnergyPossible = self.turbinePower * 24 
         self.heightDifference = heightDifference
+        self.minimumWaterLevel = 0.5
     def updateTopVolume(self, newVolume):
         self.currentTopVolume = newVolume
     def updateBottomVolume(self, newVolume):
@@ -44,22 +45,50 @@ class EnergyStorageModel:
                 })
             else: 
                 if moveWaterUp:
-                    if self.currentTopVolume + waterMovement > self.maxTopVolume:
-                        possibleWaterMovement = self.maxTopVolume - self.currentTopVolume
-                        actualEnergyLost = energyLost + ((waterMovement-possibleWaterMovement) * self.liquidDensity * self.accelerationDueToGravity * self.heightDifference) / 3600
-                    topVolumeVariation.append(self.currentTopVolume + waterMovement)
-                    bottomVolumeVariation.append(self.currentBottomValue - waterMovement)
+                    # First check whether the bottom tank has enough water to move
+                    if self.currentBottomValue - waterMovement < self.maxBottomValue*self.minimumWaterLevel:
+                        actualWaterMovement = self.currentBottomValue - self.maxBottomValue*self.minimumWaterLevel
+                        actualEnergyLost= energyLost + ((waterMovement-actualWaterMovement) * self.liquidDensity * self.accelerationDueToGravity * self.heightDifference)/3600
+                    else:
+                        actualWaterMovement = waterMovement
+                        actualEnergyLost = energyLost
+                    # Check whether the top tank has enough space to move the water
+                    if actualWaterMovement + self.currentTopVolume > self.maxTopVolume:
+                        actualWaterMovement = self.maxTopVolume - self.currentTopVolume
+                        actualEnergyLost = actualEnergyLost + ((waterMovement-actualWaterMovement) * self.liquidDensity * self.accelerationDueToGravity * self.heightDifference)/3600
+                    else:
+                        actualWaterMovement = actualWaterMovement
+                        actualEnergyLost = actualEnergyLost
+                    topVolumeVariation.append(self.currentTopVolume + actualWaterMovement)
+                    bottomVolumeVariation.append(self.currentBottomValue - actualWaterMovement)
+                    self.currentTopVolume = self.currentTopVolume + actualWaterMovement
+                    self.currentBottomValue = self.currentBottomValue - actualWaterMovement
                 else:
-                    topVolumeVariation.append(self.currentTopVolume - waterMovement)
-                    bottomVolumeVariation.append(self.currentBottomValue + waterMovement)
+                    if self.currentTopVolume - waterMovement < self.maxTopVolume*self.minimumWaterLevel:
+                        actualWaterMovement = self.currentTopVolume - self.maxTopVolume*self.minimumWaterLevel
+                        actualEnergyLost=energyLost + ((waterMovement-actualWaterMovement) * self.liquidDensity * self.accelerationDueToGravity * self.heightDifference)/3600
+                    else:
+                        actualWaterMovement = waterMovement
+                        actualEnergyLost = energyLost
+                    if actualWaterMovement + self.currentBottomValue > self.maxBottomValue:
+                        actualWaterMovement = self.maxBottomValue - self.currentBottomValue
+                        actualEnergyLost =  actualEnergyLost + ((waterMovement-actualWaterMovement) * self.liquidDensity * self.accelerationDueToGravity * self.heightDifference)/3600
+                    else:
+                        actualWaterMovement = actualWaterMovement
+                        actualEnergyLost = actualEnergyLost
+                    self.currentTopVolume = self.currentTopVolume - actualWaterMovement
+                    self.currentBottomValue = self.currentBottomValue + actualWaterMovement
+                    topVolumeVariation.append(self.currentTopVolume - actualWaterMovement)
+                    bottomVolumeVariation.append(self.currentBottomValue + actualWaterMovement)
                 energyMovementValues.append({
                     "moveWaterUp": moveWaterUp,
-                    "waterMovement": waterMovement,
+                    "requiredWaterMovement": waterMovement,
+                    "waterMovement": actualWaterMovement,
                     "requiredEnergyMovement": value,
-                    "energyMoved": value - energyLost,
-                    "energyLost": energyLost,
-                    "topVolume": topVolumeVariation[count],
-                    "bottomVolume": bottomVolumeVariation[count],
+                    "energyMoved": value - actualEnergyLost,
+                    "energyLost": actualEnergyLost,
+                    "topVolume": self.currentTopVolume,
+                    "bottomVolume": self.currentBottomValue,
                     "day": count+1,
                 })
             energyLossVariation.append(energyLost)
