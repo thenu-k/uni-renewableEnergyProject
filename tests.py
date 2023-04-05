@@ -4,14 +4,19 @@ from Model.ComponentModels.TidalEnergyModel import TidalEnergyModel
 from Model.ComponentModels.WindEnergyModel import WindEnergyModel
 from Model.ComponentModels.SolarEnergyModel import SolarEnergyModel
 from UI.UI import *
-from Data.Data import *
-from Data.helperFunctions import *
+from Data.Data import Data
 import matplotlib as mpl
 formatter = mpl.ticker.EngFormatter()
 
+numDataPoints = 365
+error = 0.025
+
 # Instantiating the component facilities
 tidalInstance =  TidalEnergyModel(
-    tidalData=retrieveTidalData(error=0), 
+    tidalData=Data.generateTidalData(
+        error=error,
+        valuesRequired=numDataPoints,
+    ), 
     unitCount = 5,
     efficiency = 0.87,
     bladeDiameter = 8,
@@ -22,49 +27,66 @@ tidalInstance =  TidalEnergyModel(
     customPower=None,
 )
 windInstance = WindEnergyModel(
-    windData=retrieveWindSpeedData(error=0),
-    unitCount=10,
+    windData=Data.generateWindSpeedData(
+        error=error,
+        interpolate=True,
+        valuesRequired = numDataPoints,
+        currentDataSpacing=30,
+    ),
+    unitCount=12,
     efficiency=0.4,
     bladeDiameter=174,
     mediumDensity=1.225,
     customDailyGenerationFunction=None,
 )
 solarInstance = SolarEnergyModel(
-    solarData=solarData, 
+    solarData=Data.retrieveSolarData(error=0),
 )
 storageInstance = EnergyStorageModel(
     liquidDensity=1000,
     accelerationDueToGravity=9.81,
     maxFlowRate=100,
     efficiency=0.5,
-    maxTopVolume=100,
-    maxBottomValue=100,
-    turbinePower=100000,
-    dataValues=len(retrieveWindSpeedData(error=0.005))
+    maxTopVolume=1000,
+    currentTopVolume=100,
+    maxBottomValue=1000,
+    currentBottomValue=100,
+    heightDifference=250,
+    turbinePower=1000,
+    dataValues=numDataPoints
 )
 # Connecting the facilities together
-renewableInstance = RenewableEnergyModel(tidalInstance, windInstance, solarInstance, storageInstance, retrieveEnergyDemandData(error=0))
+renewableInstance = RenewableEnergyModel(
+    TidalEnergyModel=tidalInstance,
+    WindEnergyModel=windInstance,
+    SolarEnergyModel=None,
+    EnergyStorageModel=storageInstance,
+    dataValues=numDataPoints,
+    energyDemand=Data.generateEnergyDemandData(
+        error=error,
+        interpolate=True,
+        valuesRequired=numDataPoints,
+        currentDataSpacing=30
+    )
+)
 tidalEnergyGeneration = renewableInstance.TidalEnergyModel.getDailyEnergyProduction()
 windEnergyGeneration = renewableInstance.WindEnergyModel.getDailyEnergyProduction()
-solarEnergyGeneration = renewableInstance.SolarEnergyModel.getDailyEnergyProduction()
 totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
-netEnergyDemand = renewableInstance.getNetDailyEnergyDemand(frequencyOfData=1)
+netEnergyDemand = renewableInstance.getNetDailyEnergyDemand()
 
-# waterMovement = renewableInstance.EnergyStorageModel.accountForStorage(netEnergyDemand, assumeUnlimitedWater=True)
-# print(waterMovement)
 
-# print(renewableInstance.TidalEnergyModel.testSingleUnitEnergyProduction(velocity=1.15, isDaily=False, isYearly=True))
-# print(sum(renewableInstance.dailyEnergyDemand))
 totalTest  = [windEnergyGeneration[count] + tidalEnergyGeneration[count] for count in range(336)]
-#convert number to engineering notation
-print(formatter(sum(netEnergyDemand)))
-# print(formatter(sum(tidalEnergyGeneration)))
-# print(formatter(renewableInstance.TidalEnergyModel.getIdealPowerPerUnit((1.15+0.6)/2)*336*24*0.87))
+# print(formatter(windEnergyGeneration[359]))
 
-compareProd(
-    energyProd=windEnergyGeneration,
-    energyProd2 = tidalEnergyGeneration,
-    energyDefecit = None,
-    energyTotal=renewableInstance.getDailyTotalEnergyProduction(),
-    energyDemand=renewableInstance.energyDemand,
-)
+# compareProd(
+#     energyProd=windEnergyGeneration,
+#     energyProd2 = tidalEnergyGeneration,
+#     energyDefecit = tidalEnergyGeneration,
+#     energyTotal=windEnergyGeneration,
+#     energyDemand=renewableInstance.energyDemand,
+# )
+
+print(renewableInstance.EnergyStorageModel.accountForStorage(
+    netEnergyDemand=[24000, -12000],
+    assumeUnlimitedWater=False,
+))

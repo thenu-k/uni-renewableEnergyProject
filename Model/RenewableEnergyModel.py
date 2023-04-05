@@ -6,27 +6,27 @@ from .ComponentModels.SolarEnergyModel import SolarEnergyModel
 from .ComponentModels.EnergyStorageModel import EnergyStorageModel
 
 class RenewableEnergyModel:
-    def __init__(self, TidalEnergyModel: type[TidalEnergyModel], WindEnergyModel: type[WindEnergyModel], SolarEnergyModel: type[SolarEnergyModel], EnergyStorageModel: type[EnergyStorageModel], energyDemand: type[list]):
+    def __init__(self, TidalEnergyModel: type[TidalEnergyModel], WindEnergyModel: type[WindEnergyModel], SolarEnergyModel: type[SolarEnergyModel], EnergyStorageModel: type[EnergyStorageModel], energyDemand: type[list], dataValues:type[int]):
         if not TidalEnergyModel and not WindEnergyModel and not SolarEnergyModel:
             raise Exception("No energy model was provided")
         self.TidalEnergyModel = TidalEnergyModel
         self.WindEnergyModel = WindEnergyModel
         self.SolarEnergyModel = SolarEnergyModel
         self.EnergyStorageModel = EnergyStorageModel
-        self.dataValues = len(self.TidalEnergyModel.tidalData)
+        self.dataValues = dataValues
         self.totalDailyEnergyProduction = None
         self.energyDemand = energyDemand
         self.netDailyEnergyDemand = None
     def getDailyTotalEnergyProduction(self):
-        if self.TidalEnergyModel:
+        if not self.TidalEnergyModel==None:
             dailyTidalEnergyProduction = self.TidalEnergyModel.getDailyEnergyProduction()
         else:
             dailyTidalEnergyProduction = [0]*self.dataValues
-        if self.SolarEnergyModel:
+        if not self.SolarEnergyModel==None:
             dailySolarEnergyProduction = self.SolarEnergyModel.getDailyEnergyProduction()
         else:
             dailySolarEnergyProduction = [0]*self.dataValues
-        if self.WindEnergyModel:
+        if not self.WindEnergyModel==None:
             dailyWindEnergyProduction = self.WindEnergyModel.getDailyEnergyProduction()
         else:
             dailyWindEnergyProduction = [0]*self.dataValues
@@ -35,10 +35,15 @@ class RenewableEnergyModel:
             totalDailyEnergyProduction[count] = dailyTidalEnergyProduction[count] + dailyWindEnergyProduction[count] + dailySolarEnergyProduction[count]
         self.totalDailyEnergyProduction = totalDailyEnergyProduction
         return totalDailyEnergyProduction
-    def getNetDailyEnergyDemand(self, frequencyOfData):
+    def getNetDailyEnergyDemand(self):
         netDailyEnergyDemand = [0]*self.dataValues
         for count in range(self.dataValues):
             netDailyEnergyDemand[count] = self.energyDemand[count] - self.totalDailyEnergyProduction[count]
         return netDailyEnergyDemand
     def accountForEnergyStorage(self):
+        return None
+    def runSimulations(self, simulationCount:type[int]):
+        workingRuns = 0
+        for count in range(simulationCount):
+            pass
         return None
