@@ -3,17 +3,26 @@ import random
 import numpy as np
 from scipy.interpolate import *
 import csv 
-
+import matplotlib.pyplot as plt
+from math import floor
 class Data:
-    def retrieveSolarData(error:type[float]):
-        return [abs(math.cos(2 * math.pi * i / 336)) + random.uniform(-0.1, 0.1) for i in range(365)]
+    def retrieveSolarData(error:type[float], interpolate:type[bool], valuesRequired:type[int], currentDataSpacing:type[int]):
+        numValues = valuesRequired
+        xSpacing = currentDataSpacing
+        with open('./Data/Files/solarDNI.csv', 'r') as f:
+            y = f.read().split(',')
+            y = [(float(i)*1000)/currentDataSpacing for i in y] #/30 as its kwh/m2/month
+        x = np.array([xSpacing * (1+i) for i in range(floor(valuesRequired/currentDataSpacing))])
+        values =  [interp1d(x, y, fill_value='extrapolate')(i+1) for i in range(numValues)]
+        solarData = [(value + random.uniform(-value*error, value*error)) for value in values]
+        return solarData
     
     # Retrieve tidal data
     def generateTidalData(error:type[float], valuesRequired:type[int]):
         numValues = valuesRequired
         currentSpeedData = [0 for i in range(numValues)]
-        topCurrentSpeed = 1.15
-        bottomCurrentSpeed = 0.6
+        topCurrentSpeed = 0.6
+        bottomCurrentSpeed = 0.7
         alternated=False
         for i in range(numValues):
             if not alternated:
@@ -32,7 +41,7 @@ class Data:
             y = [float(i) for i in y]
         y = [y[i]*1e12 for i in range(len(y))]
         x = np.array([xSpacing * (1+i) for i in range(12)])
-        values =  [interp1d(x, y, fill_value='extrapolate')(i) for i in range(numValues)]
+        values =  [interp1d(x, y, fill_value='extrapolate')(i+1) for i in range(numValues)]
         townTotal = 7.14e11
         offset = townTotal/sum(values)
         values = [offset * values[i] for i in range(len(values))]
@@ -50,6 +59,6 @@ class Data:
         windData=(average_wind*np.asarray(windData, dtype=float))
         windData = [sum(windData[count])/len(windData[count]) for count in range(len(windData))]
         xValues = np.array([daysInMonth * (1+i) for i in range(12)])
-        values =  [interp1d(xValues, windData, fill_value='extrapolate')(i) for i in range(numValues)]
+        values =  [interp1d(xValues, windData, fill_value='extrapolate')(i+1) for i in range(numValues)]
         y_values = [(value + random.uniform(-value*error, value*error)) for value in values]
         return y_values

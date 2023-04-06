@@ -56,7 +56,7 @@ def compareProd(graphs):
 
     for i in range(len(graphs)):
         plt.plot(days, graphs[i], color='black', linewidth=2)
-    # plt.ylim(0)
+    plt.ylim(0)
     plt.grid(True)
     #change grid thickness and axis thickness
     plt.rcParams['axes.linewidth'] = 1

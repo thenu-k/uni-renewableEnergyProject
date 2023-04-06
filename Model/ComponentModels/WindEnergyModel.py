@@ -16,13 +16,13 @@ class WindEnergyModel:
             self.customDailyGenerationFunction = customDailyGenerationFunction
     def getIdealPowerProductionPerUnit(self, velocity:type[float]):
         return 0.5 * self.mediumDensity * (velocity ** 3) * self.areaSwept
-    def getDailyEnergyProduction(self):
+    def getUnitlyEnergyProduction(self, hoursPerUnit:type[int]):
         if not self.customDailyGenerationFunction:
-            dailyTotalEnergy = [0]*len(self.windData)
+            unitlyTotalEnergy = [0]*len(self.windData)
             count = 0
             for velocity in self.windData:
-                dailyTotalEnergy[count] = self.getIdealPowerProductionPerUnit(velocity) * self.unitCount * self.efficiency * 24
+                unitlyTotalEnergy[count] = self.getIdealPowerProductionPerUnit(velocity) * self.unitCount * self.efficiency * hoursPerUnit
                 count += 1
-            return dailyTotalEnergy
+            return unitlyTotalEnergy
         else:
             return self.customDailyGenerationFunction()

@@ -1,18 +1,18 @@
 from ..helperFunctions import normalizeDataSet
 
 class SolarEnergyModel:
-    def __init__(self, solarData, customPower, unitCount):
+    def __init__(self, solarData, customPower, unitCount, areaPerUnit, efficiency, scalingFactor):
         self.solarData = solarData
         self.customPower = customPower
         self.unitCount = unitCount
-    def getIdealPowerPerUnit(self):
-        if self.customPower is not None:
-            return self.customPower
-        return 0
-    def getDailyEnergyProduction(self):
-        dailyTotalEnergy = [0]*len(self.solarData)
-        count = 0
-        for value in self.solarData:
-            dailyTotalEnergy[count] += self.getIdealPowerPerUnit() * self.unitCount * 24
-            count += 1
-        return dailyTotalEnergy
+        self.areaPerUnit = areaPerUnit
+        self.efficiency = efficiency
+        self.scalingFactor = scalingFactor
+    def getUnitlyEnergyProduction(self):
+        unitlyGeneration = []
+        if self.customPower is None:
+            for solarEnergyReading in self.solarData:
+                unitlyGeneration.append(solarEnergyReading*self.unitCount*self.areaPerUnit*self.efficiency * self.scalingFactor)
+            return unitlyGeneration
+        else:
+            return None

@@ -11,19 +11,26 @@ formatter = mpl.ticker.EngFormatter()
 numDataPoints = 365
 error = 0.025
 
+solarData = Data.retrieveSolarData(
+    error=error,
+    interpolate=True,
+    valuesRequired=numDataPoints,
+    currentDataSpacing=30,
+)
+
 # Instantiating the component facilities
 tidalInstance =  TidalEnergyModel(
     tidalData=Data.generateTidalData(
         error=error,
         valuesRequired=numDataPoints,
     ), 
-    unitCount = 5,
+    unitCount = 120,
     efficiency = 0.87,
-    bladeDiameter = 0.81,
+    bladeDiameter = 40,
     mediumDensity = 997.77,
     accelerationDueToGravity=9.81,
-    headHeight=20,
-    isCrossFlow=True,
+    headHeight=10,
+    isCrossFlow=False,
     customPower=None,
 )
 windInstance = WindEnergyModel(
@@ -33,28 +40,30 @@ windInstance = WindEnergyModel(
         valuesRequired = numDataPoints,
         currentDataSpacing=30,
     ),
-    unitCount=20,
-    efficiency=0.4,
+    unitCount=12,
+    efficiency=0.3,
     bladeDiameter=174,
     mediumDensity=1.225,
     customDailyGenerationFunction=None,
 )
 solarInstance = SolarEnergyModel(
-    solarData=Data.retrieveSolarData(error=0),
-    customPower=450,
-    unitCount=5e2,
+    solarData=solarData,
+    efficiency=0.25,
+    customPower=None,
+    unitCount=1e6,
+    areaPerUnit=1
 )
 storageInstance = EnergyStorageModel(
     liquidDensity=1000,
     accelerationDueToGravity=9.81,
     maxFlowRate=100,
     efficiency=1,
-    maxTopVolume=3e100,
-    currentTopVolume=1.5e50,
-    maxBottomValue=5e100,
-    currentBottomValue=4.5e50,
+    maxTopVolume=7e6,
+    currentTopVolume=5e6,
+    maxBottomValue=7e6,
+    currentBottomValue=5e6,
     heightDifference=250,
-    turbinePower=1e5*100,
+    turbinePower=440e6,
     minimumWaterLevel=0,
     dataValues=numDataPoints
 )
@@ -80,16 +89,21 @@ totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
 netEnergyDemand = renewableInstance.getNetDailyEnergyDemand()
 [excessEnergy, energyMovementValues] = renewableInstance.accountForEnergyStorage()
 
-print(energyMovementValues[0])
+print(formatter(sum(energyDemandData)))
+
+# for count in range(12):
+#     print(formatter(sum(solarEnergyGeneration[count*30:(count+1)*30])))
 
 compareProd(
     graphs=[
-        # tidalEnergyGeneration,
-        # windEnergyGeneration,
-        # totalEnergyGeneration,
+        tidalEnergyGeneration,
+        windEnergyGeneration,
+        totalEnergyGeneration,
         energyDemandData,
+        # solarEnergyGeneration
         # netEnergyDemand,
-        # excessEnergy,
+        excessEnergy,
+        solarEnergyGeneration
     
     ]
 )

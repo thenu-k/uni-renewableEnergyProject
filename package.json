@@ -5,7 +5,8 @@
   "main": "main.py",
   "scripts": {
     "test": "python tests.py",
-    "start": "python main.py"
+    "start": "python main.py",
+    "simple": "python simple.py"
   },
   "author": "Thenu Kaluarachchige",
   "license": "ISC"
