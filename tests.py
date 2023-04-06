@@ -17,9 +17,9 @@ tidalInstance =  TidalEnergyModel(
         error=error,
         valuesRequired=numDataPoints,
     ), 
-    unitCount = 0,
+    unitCount = 5,
     efficiency = 0.87,
-    bladeDiameter = 8,
+    bladeDiameter = 0.81,
     mediumDensity = 997.77,
     accelerationDueToGravity=9.81,
     headHeight=20,
@@ -33,7 +33,7 @@ windInstance = WindEnergyModel(
         valuesRequired = numDataPoints,
         currentDataSpacing=30,
     ),
-    unitCount=12,
+    unitCount=20,
     efficiency=0.4,
     bladeDiameter=174,
     mediumDensity=1.225,
@@ -42,55 +42,54 @@ windInstance = WindEnergyModel(
 solarInstance = SolarEnergyModel(
     solarData=Data.retrieveSolarData(error=0),
     customPower=450,
-    unitCount=5000,
+    unitCount=5e2,
 )
 storageInstance = EnergyStorageModel(
     liquidDensity=1000,
     accelerationDueToGravity=9.81,
     maxFlowRate=100,
-    efficiency=0.5,
-    maxTopVolume=80,
-    currentTopVolume=50,
-    maxBottomValue=80,
-    currentBottomValue=50,
+    efficiency=1,
+    maxTopVolume=3e100,
+    currentTopVolume=1.5e50,
+    maxBottomValue=5e100,
+    currentBottomValue=4.5e50,
     heightDifference=250,
-    turbinePower=1000,
+    turbinePower=1e5*100,
+    minimumWaterLevel=0,
     dataValues=numDataPoints
 )
 # Connecting the facilities together
+energyDemandData = Data.generateEnergyDemandData(
+        error=error,
+        interpolate=True,
+        valuesRequired=numDataPoints,
+        currentDataSpacing=30
+)
 renewableInstance = RenewableEnergyModel(
     TidalEnergyModel=tidalInstance,
     WindEnergyModel=windInstance,
     SolarEnergyModel=solarInstance,
     EnergyStorageModel=storageInstance,
     dataValues=numDataPoints,
-    energyDemand=Data.generateEnergyDemandData(
-        error=error,
-        interpolate=True,
-        valuesRequired=numDataPoints,
-        currentDataSpacing=30
-    )
+    energyDemand=energyDemandData
 )
 tidalEnergyGeneration = renewableInstance.TidalEnergyModel.getDailyEnergyProduction()
 windEnergyGeneration = renewableInstance.WindEnergyModel.getDailyEnergyProduction()
 solarEnergyGeneration = renewableInstance.SolarEnergyModel.getDailyEnergyProduction()
 totalEnergyGeneration = renewableInstance.getDailyTotalEnergyProduction()
 netEnergyDemand = renewableInstance.getNetDailyEnergyDemand()
+[excessEnergy, energyMovementValues] = renewableInstance.accountForEnergyStorage()
 
+print(energyMovementValues[0])
 
-totalTest  = [windEnergyGeneration[count] + tidalEnergyGeneration[count] for count in range(336)]
-# print(formatter(windEnergyGeneration[359]))
-
-
-# compareProd(
-#     energyProd=windEnergyGeneration,
-#     energyProd2 = solarEnergyGeneration,
-#     energyDefecit = None,
-#     energyTotal=solarEnergyGeneration,
-#     energyDemand=renewableInstance.energyDemand,
-# )
-
-print(renewableInstance.EnergyStorageModel.accountForStorage(
-    netEnergyDemand=[24000, -24000],
-    assumeUnlimitedWater=False,
-))
+compareProd(
+    graphs=[
+        # tidalEnergyGeneration,
+        # windEnergyGeneration,
+        # totalEnergyGeneration,
+        energyDemandData,
+        # netEnergyDemand,
+        # excessEnergy,
+    
+    ]
+)

@@ -35,20 +35,32 @@ def plotData(tidalEnergyGeneration, windEnergyGeneration, solarEnergyGeneration,
     plt.show()
 
 
-def compareProd(energyProd,energyProd2,energyTotal, energyDemand, energyDefecit):
-    days = np.arange(1, len(energyProd)+1)
-    plt.plot(days, energyDemand, color='b')
-    if energyProd:
-        plt.plot(days, energyProd, color='#AAAAAA', linestyle='dotted')
-    if energyProd2:
-        # hex value for dark gray: #AAAAAA
-        plt.plot(days, energyProd2, color='#AAAAAA', linestyle='dotted')
-    if energyTotal:
-        plt.plot(days, energyTotal, color='r')
-    if energyDefecit:
-        plt.plot(days, energyDefecit, color='g')
-    plt.xlabel("X-axis data")
-    plt.ylabel("Y-axis data")
-    plt.ylim(0)
-    plt.title('multiple plots')
+def compareProd(graphs):
+    # days = np.arange(1, len(energyProd)+1)
+    # plt.plot(days, energyDemand, color='b')
+    # if energyProd:
+    #     plt.plot(days, energyProd, color='#AAAAAA', linestyle='dotted')
+    # if energyProd2:
+    #     # hex value for dark gray: #AAAAAA
+    #     plt.plot(days, energyProd2, color='#AAAAAA', linestyle='dotted')
+    # if energyTotal:
+    #     plt.plot(days, energyTotal, color='r')
+    # if energyDefecit:
+    #     plt.plot(days, energyDefecit, color='g')
+    # plt.xlabel("X-axis data")
+    # plt.ylabel("Y-axis data")
+    # plt.ylim(0)
+    # plt.title('multiple plots')
+    # plt.show()
+    days = np.arange(1, len(graphs[0])+1)
+
+    for i in range(len(graphs)):
+        plt.plot(days, graphs[i], color='black', linewidth=2)
+    # plt.ylim(0)
+    plt.grid(True)
+    #change grid thickness and axis thickness
+    plt.rcParams['axes.linewidth'] = 1
+    plt.rcParams['grid.linewidth'] = 1
+    plt.ylabel("Energy (Wh)")
+    plt.xlabel("Days")
     plt.show()

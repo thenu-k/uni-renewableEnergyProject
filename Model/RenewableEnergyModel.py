@@ -17,6 +17,7 @@ class RenewableEnergyModel:
         self.totalDailyEnergyProduction = None
         self.energyDemand = energyDemand
         self.netDailyEnergyDemand = None
+        self.finalEnergyDemand = None
     def getDailyTotalEnergyProduction(self):
         if not self.TidalEnergyModel==None:
             dailyTidalEnergyProduction = self.TidalEnergyModel.getDailyEnergyProduction()
@@ -39,11 +40,18 @@ class RenewableEnergyModel:
         netDailyEnergyDemand = [0]*self.dataValues
         for count in range(self.dataValues):
             netDailyEnergyDemand[count] = self.energyDemand[count] - self.totalDailyEnergyProduction[count]
+        self.netDailyEnergyDemand = netDailyEnergyDemand
         return netDailyEnergyDemand
-    def accountForEnergyStorage(self):
-        return None
     def runSimulations(self, simulationCount:type[int]):
         workingRuns = 0
         for count in range(simulationCount):
             pass
         return None
+    def accountForEnergyStorage(self):
+        energyMovementValues = self.EnergyStorageModel.simulate(self.netDailyEnergyDemand, False)
+        excessEnergy = []
+        count = 0
+        for value in energyMovementValues:
+            excessEnergy.append(self.netDailyEnergyDemand[count] - value['energyGenerated'])
+            count += 1
+        return [excessEnergy, energyMovementValues]
