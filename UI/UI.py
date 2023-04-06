@@ -55,12 +55,15 @@ def compareProd(graphs):
     days = np.arange(1, len(graphs[0])+1)
 
     for i in range(len(graphs)):
-        plt.plot(days, graphs[i], color='black', linewidth=2)
+        if i == 0:
+            plt.plot(days, graphs[i], color='b', linewidth=2)
+        else:
+            plt.plot(days, graphs[i], color='r', linewidth=2)
     plt.ylim(0)
     plt.grid(True)
     #change grid thickness and axis thickness
     plt.rcParams['axes.linewidth'] = 1
     plt.rcParams['grid.linewidth'] = 1
     plt.ylabel("Energy (Wh)")
-    plt.xlabel("Days")
+    plt.xlabel("Units")
     plt.show()

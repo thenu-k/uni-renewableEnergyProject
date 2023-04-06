@@ -9,9 +9,9 @@ import matplotlib as mpl
 formatter = mpl.ticker.EngFormatter()
 
 #Data
-numDataPoints = 12
+numDataPoints = 365
 error = 0
-spacing = 1
+spacing = 30
 solarData = Data.retrieveSolarData(
     error=error,
     interpolate=True,
@@ -55,7 +55,7 @@ windModel = WindEnergyModel(
 tidalModel = TidalEnergyModel(
     topTidalCurrentSpeed=1.15,
     bottomTidalCurrentSpeed=0.6,
-    unitCount=50,
+    unitCount=80,
     isCrossFlow=False,
     bladeDiameter=40,
     efficiency=0.87,
@@ -63,8 +63,22 @@ tidalModel = TidalEnergyModel(
     headHeight=None,
     accelerationDueToGravity=9.81,
     customPower=None,
-    isDaily=False
+    isDaily=True
 )
+secondTidalModel = TidalEnergyModel(
+    topTidalCurrentSpeed=1.15,
+    bottomTidalCurrentSpeed=0.6,
+    unitCount=40,
+    isCrossFlow=True,
+    bladeDiameter=0.8,
+    efficiency=0.87,
+    mediumDensity=999.7,
+    headHeight=40,
+    accelerationDueToGravity=9.81,
+    customPower=None,
+    isDaily=True
+)
+
 
 # print(formatter(sum(energyDemandData)))
 
@@ -72,20 +86,25 @@ tidalModel = TidalEnergyModel(
 renewableInstance = RenewableEnergyModel(
     SolarEnergyModel=solarModel,
     WindEnergyModel=windModel,
-    TidalEnergyModel=tidalModel,
+    TidalEnergyModels=[tidalModel, secondTidalModel],
     EnergyStorageModel=None,
     dataValues=numDataPoints,
-    hoursPerUnit=24*30,
+    hoursPerUnit=24,
     energyDemand=energyDemandData,
 )
 #Wind production -> correct
 #Solar production -> 
 [totalUnitlyEnergyProduction, unitlyTidalEnergyProduction, unitlyWindEnergyProduction, unitlySolarEnergyProduction]= renewableInstance.getUnitlyTotalEnergyProduction()
 
-# print(unitlyTidalEnergyProduction)
+flag = False
+for count in range(numDataPoints):
+    if totalUnitlyEnergyProduction[count] < energyDemandData[count]:#
+        flag=True
+print(flag)
+
 compareProd([
-    totalUnitlyEnergyProduction,
     energyDemandData,
+    totalUnitlyEnergyProduction,
     # unitlyTidalEnergyProduction,
     # unitlyWindEnergyProduction,
     # unitlySolarEnergyProduction,

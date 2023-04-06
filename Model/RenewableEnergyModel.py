@@ -6,13 +6,13 @@ from .ComponentModels.SolarEnergyModel import SolarEnergyModel
 from .ComponentModels.EnergyStorageModel import EnergyStorageModel
 
 class RenewableEnergyModel:
-    def __init__(self, TidalEnergyModel: type[TidalEnergyModel], WindEnergyModel: type[WindEnergyModel], SolarEnergyModel: type[SolarEnergyModel], EnergyStorageModel: type[EnergyStorageModel], energyDemand: type[list], dataValues:type[int], hoursPerUnit:type[int]):
+    def __init__(self, TidalEnergyModels: type[list[TidalEnergyModel]], WindEnergyModel: type[WindEnergyModel], SolarEnergyModel: type[SolarEnergyModel], EnergyStorageModel: type[EnergyStorageModel], energyDemand: type[list], dataValues:type[int], hoursPerUnit:type[int]):
         if not TidalEnergyModel and not WindEnergyModel and not SolarEnergyModel:
             raise Exception("No energy model was provided")
-        self.TidalEnergyModel = TidalEnergyModel
+        self.TidalEnergyModels = TidalEnergyModels
         self.WindEnergyModel = WindEnergyModel
         self.SolarEnergyModel = SolarEnergyModel
-        self.EnergyStorageModel = EnergyStorageModel
+        self.EnergyStorageModels = EnergyStorageModel
         self.dataValues = dataValues
         self.totalUnitlyEnergyProduction = None
         self.energyDemand = energyDemand
@@ -20,8 +20,16 @@ class RenewableEnergyModel:
         self.finalEnergyDemand = None
         self.hoursPerUnit = hoursPerUnit
     def getUnitlyTotalEnergyProduction(self):
-        if not self.TidalEnergyModel==None:
-            unitlyTidalEnergyProduction = self.TidalEnergyModel.getUnitlyEnergyProduction(unitCount=self.dataValues)
+        if not self.TidalEnergyModels==None:
+            unitlyTidalEnergyProduction = [0]*self.dataValues
+            allModels =[]
+            for tidalModel in self.TidalEnergyModels:
+                allModels.append(tidalModel.getUnitlyEnergyProduction(unitCount=self.dataValues))
+            for dataSet in allModels:
+                count = 0
+                for value in dataSet:
+                    unitlyTidalEnergyProduction[count] += value
+                    count += 1
         else:
             unitlyTidalEnergyProduction = [0]*self.dataValues
         if not self.SolarEnergyModel==None:
