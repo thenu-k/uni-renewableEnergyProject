@@ -1,8 +1,9 @@
 from ..helperFunctions import normalizeDataSet
 from math import pi
+import random
 
 class TidalEnergyModel:
-    def __init__(self, topTidalCurrentSpeed, bottomTidalCurrentSpeed, unitCount:type[int], efficiency:type[float], bladeDiameter:type[float], mediumDensity:type[float], headHeight:type[float], accelerationDueToGravity:type[float], isCrossFlow:type[bool], customPower: type[float], isDaily:type[bool]):
+    def __init__(self, topTidalCurrentSpeed, bottomTidalCurrentSpeed, unitCount:type[int], efficiency:type[float], bladeDiameter:type[float], mediumDensity:type[float], headHeight:type[float], accelerationDueToGravity:type[float], isCrossFlow:type[bool], customPower: type[float], isDaily:type[bool], error:type[float]):
         if efficiency > 1:
             raise ValueError("Efficiency cannot be greater than 1")
         self.unitCount = unitCount
@@ -15,6 +16,7 @@ class TidalEnergyModel:
         self.topTidalCurrentSpeed = topTidalCurrentSpeed
         self.bottomTidalCurrentSpeed = bottomTidalCurrentSpeed
         self.isDaily = isDaily
+        self.error = error
         if isCrossFlow:
             self.headHeight = headHeight
         else:
@@ -24,6 +26,8 @@ class TidalEnergyModel:
         else:
             self.customPower = None
     def getIdealPowerPerUnit(self, velocity):
+        # add random error from uniform distribution
+        velocity = velocity + random.uniform(-velocity*self.error, velocity*self.error)
         if self.customPower:
             raise ValueError("Custom power cannot be used with this function")
         if self.isCrossFlow:
