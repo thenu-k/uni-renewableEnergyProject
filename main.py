@@ -8,6 +8,7 @@ from Data.Data import Data
 import matplotlib as mpl
 import csv
 formatter = mpl.ticker.EngFormatter()
+#
 
 #Data
 numDataPoints = 365
